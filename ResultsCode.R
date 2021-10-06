@@ -40,7 +40,7 @@ p_cdf_NPC_scenario <- ggplot(df, aes(NPC, colour = Design)) +
   labs(x = "NPC (Millions Euros)", y = " ") + 
   facet_grid(cols = vars(Scenario))
 
-p_cdf_NPC_design <- ggplot(df, aes(NPC, linetype = Scenario)) +
+p_cdf_NPC_design <- ggplot(filter(df, Design == "design2"), aes(NPC, linetype = Scenario)) +
   stat_ecdf() +
   scale_linetype_manual(values=c("solid", "twodash", "dotted")) +
   labs(x = "NPC (Millions Euros)", y = " ") + 
