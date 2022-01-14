@@ -16,7 +16,7 @@ val_colors <- c(wesanderson::wes_palettes$Darjeeling1[1],
                 wesanderson::wes_palettes$Darjeeling1[5])
 breaks_design <- c("design1", "design2", "design3")
 
-# Figure 2: NPC against CO2-equivalent emissions --------------------------
+# NPC against CO2-equivalent emissions --------------------------
 
 p_scatter <- ggplot(df, aes(x=Emissions, y=NPC)) +
   geom_point(aes(col=Design, shape=Scenario)) +
@@ -32,7 +32,7 @@ p_scatter_scenario <- ggplot(df, aes(x=Emissions, y=NPC)) +
   facet_grid(cols = vars(Scenario))
 
 
-# Figure 3: empirical cdfs for NPC ---------------------------------------
+# empirical cdfs for NPC ---------------------------------------
 
 p_cdf_NPC_scenario <- ggplot(df, aes(NPC, colour = Design)) + 
   stat_ecdf() + scale_color_manual(" ", breaks = breaks_design,
@@ -47,7 +47,7 @@ p_cdf_NPC_design <- ggplot(filter(df, Design == "design2"), aes(NPC, linetype = 
   facet_grid(cols = vars(Design), scales = "free")
 
 
-# Figure 4: empirical cdfs for CO2 ----------------------------------------
+# empirical cdfs for CO2 ----------------------------------------
 
 p_cdf_CO2_scenario <-  ggplot(df, aes(Emissions, colour = Design)) + 
   stat_ecdf() +
@@ -72,6 +72,7 @@ ks.NPC_neutral <- kolmogorov_smirnov_test(df = df.NPC, scenario = "Neutral",
                                           locate = 3)
 ks.NPC_green <- kolmogorov_smirnov_test(df = df.NPC, scenario = "Green",
                                         locate = 3)
+
 # comparison between scenarios
 ks.NPC_design1 <- kolmogorov_smirnov_test_sc(df = df.NPC, design = "design1",
                                              locate = 3)
@@ -99,51 +100,7 @@ ks.CO2_design2 <- kolmogorov_smirnov_test_sc(df = df.CO2, design = "design2",
 ks.CO2_design3 <- kolmogorov_smirnov_test_sc(df = df.CO2, design = "design3",
                                              locate = 3)
 
-# Figure 5: L1 distance dispersion ordering -------------------------------
-# Prior to considering L1 distance dispersion ordering, we are required to
-# pre-process the data and standardize the variables to the range [0, 1].
-
-NPC.std = (df$NPC - min(df$NPC))/(max(df$NPC)-min(df$NPC))
-Emissions.std = (df$Emissions - min(df$Emissions))/
-  (max(df$Emissions)-min(df$Emissions))
-
-df.standard <- as_tibble(df) %>%
-  mutate(NPC.std = NPC.std, Emissions.std = Emissions.std)
-
-L1.df <- df.standard %>%
-  group_by(Scenario, Design) %>%
-  group_modify(~ tibble(L1_dist = c(dist(.x$NPC.std)) + 
-                          c(dist(.x$Emissions.std)))) %>%
-  ungroup()
-
-
-p_cdf_L1_scenario <- ggplot(L1.df, aes(L1_dist, colour = Design)) + 
-  stat_ecdf() +
-  scale_color_manual(" ", breaks = breaks_design, values = val_colors,
-                     labels = breaks_design) +
-  labs(x = " ", y = " ") + 
-  facet_grid(cols = vars(Scenario))
-
-p_cdf_L1_design <- ggplot(L1.df, aes(L1_dist, linetype = Scenario)) + 
-  stat_ecdf() +
-  scale_linetype_manual(values=c("solid", "twodash", "dotted")) +
-  labs(x = " ", y = " ") + 
-  facet_grid(cols = vars(Design), scales = "free")
-
-
-# KS distance and p-values for L1 distance dispersion ---------------------
-
-ks.L1_green <- kolmogorov_smirnov_test(df = L1.df, scenario = "Green",
-                                       locate = 3)
-ks.L1_design1 <- kolmogorov_smirnov_test_sc(df = L1.df, design = "design1",
-                                            locate = 3)
-ks.L1_design2 <- kolmogorov_smirnov_test_sc(df = L1.df, design = "design2",
-                                            locate = 3)
-ks.L1_design3 <- kolmogorov_smirnov_test_sc(df = L1.df, design = "design3",
-                                            locate = 3)
-
-
-# Figure 6: Generalized simplex dispersion ordering -----------------------
+# Figure 5: Generalized simplex dispersion ordering -----------------------
 
 simplex.df <- df %>%
   group_by(Scenario, Design) %>%
@@ -179,10 +136,6 @@ ks.simplex_design2 <- kolmogorov_smirnov_test_sc(df = simplex.df,
                                                  design = "design2", locate = 3)
 ks.simplex_design3 <- kolmogorov_smirnov_test_sc(df = simplex.df, 
                                                  design = "design3", locate = 3)
-
-
-
-
 
 
 
