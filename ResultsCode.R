@@ -34,13 +34,15 @@ p_scatter_scenario <- ggplot(df, aes(x=Emissions, y=NPC)) +
 
 # empirical cdfs for NPC ---------------------------------------
 
-p_cdf_NPC_scenario <- ggplot(df, aes(NPC, colour = Design)) + 
-  stat_ecdf() + scale_color_manual(" ", breaks = breaks_design,
-                     values = val_colors, labels = breaks_design) +
+p_cdf_NPC_scenario <- ggplot(df, aes(NPC, linetype = Design)) + 
+  stat_ecdf() + 
+  scale_linetype_manual(" ", breaks = breaks_design,
+                     values=c("solid", "twodash", "dotted"), 
+                     labels = breaks_design) +
   labs(x = "NPC (Millions Euros)", y = " ") + 
   facet_grid(cols = vars(Scenario))
 
-p_cdf_NPC_design <- ggplot(filter(df, Design == "design2"), aes(NPC, linetype = Scenario)) +
+p_cdf_NPC_design <- ggplot(df, aes(NPC, linetype = Scenario)) +
   stat_ecdf() +
   scale_linetype_manual(values=c("solid", "twodash", "dotted")) +
   labs(x = "NPC (Millions Euros)", y = " ") + 
@@ -49,10 +51,11 @@ p_cdf_NPC_design <- ggplot(filter(df, Design == "design2"), aes(NPC, linetype = 
 
 # empirical cdfs for CO2 ----------------------------------------
 
-p_cdf_CO2_scenario <-  ggplot(df, aes(Emissions, colour = Design)) + 
+p_cdf_CO2_scenario <-  ggplot(df, aes(Emissions, linetype = Design)) + 
   stat_ecdf() +
-  scale_color_manual(" ", breaks = breaks_design, values = val_colors,
-                     labels = breaks_design) +
+  scale_linetype_manual(" ", breaks = breaks_design, 
+                        values = c("solid", "twodash", "dotted"),
+                        labels = breaks_design) +
   labs(x = "Emissions (Mton)", y = " ") + 
   facet_grid(cols = vars(Scenario))
 
@@ -104,14 +107,15 @@ ks.CO2_design3 <- kolmogorov_smirnov_test_sc(df = df.CO2, design = "design3",
 
 simplex.df <- df %>%
   group_by(Scenario, Design) %>%
-  group_modify(~ tibble(simplex = simplex_calc(x = .x))) %>%
+  group_modify(~ tibble(simplex = simplex_calc(x = .x))) %>% 
   ungroup()
 
 
-p_cdf_Simp_scenario <- ggplot(simplex.df, aes(simplex, colour = Design)) + 
-  stat_ecdf(size = 1) +
-  scale_color_manual(" ", breaks = breaks_design, values = val_colors,
-                     labels = breaks_design) +
+p_cdf_Simp_scenario <- ggplot(simplex.df, aes(simplex, linetype = Design)) + 
+  stat_ecdf() +
+  scale_linetype_manual(" ", breaks = breaks_design, 
+                        values = c("solid", "twodash", "dotted"),
+                        labels = breaks_design) +
   labs(x = " ", y = " ") + 
   facet_grid(cols = vars(Scenario))
 
@@ -120,6 +124,11 @@ p_cdf_Simp_design <- ggplot(simplex.df, aes(simplex, linetype = Scenario)) +
   scale_linetype_manual(values=c("solid", "twodash", "dotted")) +
   labs(x = " ", y = " ") + 
   facet_grid(cols = vars(Design), scales = "free")
+
+
+ggsave("HeatNetwork/PaperRevisions/Plot5Design.pdf", p_cdf_Simp_design,
+       width = 10, height = 5)
+
 
 
 # KS distance and p-value for G.S. disperion ordering ---------------------
