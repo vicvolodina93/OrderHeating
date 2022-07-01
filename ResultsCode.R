@@ -126,8 +126,6 @@ p_cdf_Simp_design <- ggplot(simplex.df, aes(simplex, linetype = Scenario)) +
   facet_grid(cols = vars(Design), scales = "free")
 
 
-ggsave("HeatNetwork/PaperRevisions/Plot5Design.pdf", p_cdf_Simp_design,
-       width = 10, height = 5)
 
 
 
